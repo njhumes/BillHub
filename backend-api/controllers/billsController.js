@@ -24,13 +24,13 @@ const Bill = require('../models/bill');
 // CREATE ROUTE
 router.post('/', async (req, res) => {
   try {
-    console.log(req.body, ' this is req.body');
-    const createdMovie = await Movie.create(req.body);
-    console.log('response happening?')
-    res.json({
-      status: 200,
-      data: createdMovie
-    });
+    // console.log(req.body, ' this is req.body');
+    // const createdMovie = await Movie.create(req.body);
+    // console.log('response happening?')
+    // res.json({
+    //   status: 200,
+    //   data: createdMovie
+    // });
   } catch(err){
     console.log(err);
     res.send(err);
@@ -40,11 +40,11 @@ router.post('/', async (req, res) => {
 // SHOW ROUTE
 router.get('/:id', async (req, res, next) => {
      try  {
-        const foundMovie = await Movie.findById(req.params.id);
-        res.json({
-          status: 200,
-          data: foundMovie
-        });
+        // const foundMovie = await Movie.findById(req.params.id);
+        // res.json({
+        //   status: 200,
+        //   data: foundMovie
+        // });
       } catch (err){
         res.send(err);
       }
@@ -53,11 +53,11 @@ router.get('/:id', async (req, res, next) => {
 // UPDATE ROUTE
 router.put('/:id', async (req, res) => {
   try {
-    const updatedMovie = await Movie.findByIdAndUpdate(req.params.id, req.body, {new: true});
-    res.json({
-      status: 200,
-      data: updatedMovie
-    });
+    // const updatedMovie = await Movie.findByIdAndUpdate(req.params.id, req.body, {new: true});
+    // res.json({
+    //   status: 200,
+    //   data: updatedMovie
+    // });
   } catch(err){
     res.send(err)
   }
@@ -66,11 +66,11 @@ router.put('/:id', async (req, res) => {
 // DELETE ROUTE
 router.delete('/:id', async (req, res) => {
   try {
-     const deletedMovie = await Movie.findByIdAndRemove(req.params.id);
-      res.json({
-        status: 200,
-        data: deletedMovie
-      });
+    //  const deletedMovie = await Movie.findByIdAndRemove(req.params.id);
+    //   res.json({
+    //     status: 200,
+    //     data: deletedMovie
+    //   });
   } catch(err){
     res.send(err);
   }

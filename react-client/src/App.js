@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import { Route, Switch } from 'react-router-dom';
-// import { Button } from 'reactstrap';
 import TrackingContainer from './TrackingContainer/TrackingContainer';
 import Navigation from './Navigation/Navigation';
 import TrendingContainer from './TrendingContainer/TrendingContainer';
@@ -10,7 +9,7 @@ import LegislatorContainer from './LegislatorContainer/LegislatorContainer.js';
 import Login from './Login/Login.js';
 import SearchBar from './SearchBar/SearchBar'
 const statesApiKey = process.env.OPEN_STATES_API_KEY;
-const federalApiKey = process.env.PRO_PUBLICA_API_KEY;
+// const federalApiKey = process.env.PRO_PUBLICA_API_KEY;
 // may need apollo packages for handling graphQL
 
 // ERROR 404
@@ -62,7 +61,7 @@ class App extends Component {
       const response = await fetch(`${cors_api_url}https://openstates.org/graphql?query={bills(last:2){edges{node{title}}}}`, {
         method: 'GET',
         headers: {
-          "X-API-KEY": "70a944df-df9d-48e6-b38a-29b09cd7c3db",
+          "X-API-KEY": statesApiKey,
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
