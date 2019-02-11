@@ -58,12 +58,15 @@ class App extends Component {
       const cors_api_host = 'cors-anywhere.herokuapp.com';
       const cors_api_url = 'https://' + cors_api_host + '/';
 
-      const response = await fetch(`${cors_api_url}https://openstates.org/graphql?query={bills(last:2){edges{node{title}}}}`, {
-        method: 'GET',
+      const response = await fetch(`${cors_api_url}https://openstates.org/graphql`, {
+        method: 'POST',
         headers: {
           "X-API-KEY": statesApiKey,
           "Content-Type": "application/x-www-form-urlencoded",
         },
+        data: {
+          "query": "{people(first: 3){edges{node{name}}}}"
+        }
       });
 
       if(!response.ok){
