@@ -42,7 +42,7 @@ class App extends Component {
       reps: []
       }
   }
-  getTopTrackedBills = async () => {
+  getTrendingBills = async () => {
     try {
         const topBills = await fetch('http://localhost:9000/trending', {
             method: 'GET',
@@ -79,8 +79,13 @@ class App extends Component {
     console.log(`Radio Button should now be: ${this.state.queryBtn}`);
   }
   updateNav = (page) => {
+    // If path is trending, then get trending bills
     this.setState({ 
       activePage: page
+    }, function() {
+      if (page == "trending"){
+        this.getTrendingBills();
+      }
     });
   }
 // ==================================================================
@@ -139,8 +144,16 @@ class App extends Component {
 // ==================================================================
 // ADD TO TRACKEDBILLS IN REACT (BASED ON DB REPLY)
 // ==================================================================
+          let updatedArray = [...this.state.bills];
+          for(let i = 0; i < updatedArray.length; i++) {
+            if(updatedArray[i]._id == billToTrack._id) {
+              updatedArray[i].trackingCount ++
+            }
+          }
+
           this.setState({ 
             trackedBills: [...this.state.trackedBills, parsedUpdateBill.data],
+            bills: updatedArray
           }, function() {
             console.log(`We are now tracking this bill: ${this.state.trackedBills[this.state.trackedBills.length-1].title}`)
           });
@@ -250,16 +263,26 @@ class App extends Component {
 // ==================================================================
       if (parsedUntrackBill.status == 200) {
         console.log(`User-tracked bills: ${this.state.trackedBills}.`)
+
         let arr = [];
         this.state.trackedBills.forEach((bill) => {
           if (bill._id !== billId){
             arr.push(bill);
           }
         })
+
+        let updatedArray = [...this.state.bills];
+        for(let i = 0; i < updatedArray.length; i++) {
+          if(updatedArray[i]._id == billId && updatedArray[i].trackingCount) {
+            updatedArray[i].trackingCount --
+          }
+        }
+
         this.setState({
-        trackedBills: arr
+          trackedBills: arr,
+          bills: updatedArray
         }, function() {
-        console.log(`React: removed bill ID ${billId}. User-tracked bills: ${this.state.trackedBills}.`)
+          console.log(`React: removed bill ID ${billId}. User-tracked bills: ${this.state.trackedBills}.`)
       });
       }
     } catch (err) {

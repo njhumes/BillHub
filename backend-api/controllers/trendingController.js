@@ -4,16 +4,19 @@ const TrendingBills = require('../models/bill');
 
 // INDEX ROUTE
  router.get('/', async (req, res, next) => {
-    console.log(`Fetching trending data from Express API...`)
+    console.log(`QUERYING FOR TRENDING BILLS...`)
 
     // Find bills with more than 0 tracking (Sort in the future...)
     try  {
-        const trendingBills = await TrendingBills.find({ trackingCount: { $gt: 0} });
+        // const trendingBills = await TrendingBills.find({ trackingCount: { $gt: 0} });
+        
+        const trendingBills = await TrendingBills.find().sort({trackingCount:-1}).limit(4) // for MAX
+        
+        console.log(`TOP BILLS: ${trendingBills}`)
         res.json({
             status: 200,
             data: trendingBills
         });
-        console.log(`Server data response: ${trendingBills.json()}`)
     } catch (err){
       res.send(err)
     }

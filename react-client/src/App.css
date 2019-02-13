@@ -50,3 +50,11 @@
   width:200px;
   display:inline-block;
 }
+
+.centerButton {
+  text-align: center;
+}
+
+.trackingCount {
+  padding-left:8px;
+}

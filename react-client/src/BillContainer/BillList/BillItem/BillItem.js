@@ -6,12 +6,14 @@ const BillItem = (props) => {
         <Card body>
             <Row>
                 <Col xs="1">
-                    <h1>{props.billInfo.trackingCount}</h1>
+                    <div className="centerButton">
+                        <h1 className="trackingCount">{props.billInfo.trackingCount}</h1>
+                        <Button onClick={props.addBillToTracking.bind(this,props.billInfo)}>Track</Button>
+                    </div>
                 </Col>
                 <Col sm="11">
                     <CardTitle><h4>{props.billInfo.title}</h4></CardTitle>
                     <CardText>{props.billInfo.summary}</CardText>
-                    <Button onClick={props.addBillToTracking.bind(this,props.billInfo)}>Track</Button>
                 </Col>
             </Row>
         </Card>
