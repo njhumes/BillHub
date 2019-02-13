@@ -9,7 +9,7 @@ const NavItem = (props) => {
     let className = isActive ? itemClass + ' active' : itemClass;
 
     return (
-        <Link to={'/' + props.path} onClick={props.updateNav.bind(this,props.path)} className={className} href="#">{currPage}</Link>
+        <Link to={'/' + props.path} onClick={props.updateNav.bind(this,props.path)} className={className}>{currPage}</Link>
     )
 }
 

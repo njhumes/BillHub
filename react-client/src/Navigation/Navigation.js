@@ -5,7 +5,7 @@ const Nav = (props) => {
   return (
     <header>
       {/* BILLHUB HEADER */}
-      <a className="navbar-brand" href="#"><h1>BillHub</h1></a>
+      <a className="navbar-brand" href="#"><img src="https://unsplash.com/photos/InsHJ5sg2vc"/><span>BillHub</span></a>
 
       <nav className="nav nav-pills nav-fill">
           <NavItem updateNav={props.updateNav.bind(this)} path="tracking"/>

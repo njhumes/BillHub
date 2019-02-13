@@ -3,8 +3,6 @@ import { Button, ButtonGroup, Container, Col, Row, Input, InputGroup } from 'rea
 
 const SearchBar = (props) => {
     return (
-        <Container>
-            <br/>
             <Row>
 
                 {/* FILTER BUTTONS */}
@@ -23,8 +21,6 @@ const SearchBar = (props) => {
                     </InputGroup>
                 </Col>
             </Row>
-            <br/>
-        </Container>
     )
 }
 

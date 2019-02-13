@@ -4,7 +4,7 @@ import BillItem from './BillItem/BillItem'
 const BillList = (props) => {
     // MAP OVER DATA AND MAKE BILL ITEMS
     const billList = props.bills.map((bill,i) => {
-        return <li key={i}> <BillItem billInfo={bill}/> </li>
+        return <li key={i}> <BillItem trackedBills={props.trackedBills} addBillToTracking={props.addBillToTracking.bind(this)} billInfo={bill}/> </li>
     })
   
     return (

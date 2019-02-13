@@ -4,9 +4,9 @@ import { Card, Button, CardTitle, CardText } from 'reactstrap';
 const BillItem = (props) => {
     return (
         <Card body>
-            <CardTitle>Bill Title</CardTitle>
-            <CardText>Bill text.</CardText>
-            <Button>Track</Button>
+            <CardTitle><h4>{props.billInfo.title}</h4></CardTitle>
+            <CardText>{props.billInfo.summary}</CardText>
+            <Button onClick={props.addBillToTracking.bind(this,props.billInfo)}>Track</Button>
         </Card>
     )
 }

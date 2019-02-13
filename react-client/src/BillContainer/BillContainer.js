@@ -3,7 +3,7 @@ import BillList from './BillList/BillList'
 
 const BillContainer = (props) => {
     return (
-      <BillList bills={props.bills}/>
+      <BillList addBillToTracking={props.addBillToTracking.bind(this)} bills={props.bills} trackedBills={props.trackedBills}/>
     )
 }
 
