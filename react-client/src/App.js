@@ -83,6 +83,9 @@ class App extends Component {
       activePage: page
     });
   }
+// ==================================================================
+// UPDATE STATE WITH SUCCESSFUL LOGIN
+// ==================================================================
   loginSuccess = (userId) => {
     this.setState({
       logged: true,
@@ -92,33 +95,15 @@ class App extends Component {
     });
   }
   addBillToTracking = async (billToTrack) => {
-    // =====================================
-    // UPDATE/CREATE IN MONGO DATABASE
-    // =====================================
+// ==================================================================
+// UPDATE/CREATE IN MONGO DATABASE (CHECK USERS TRACKING INFO FIRST)
+// ==================================================================
     try {
-      // =====================================
-      // UPDATE COUNT IN MONGO IF ID EXISTS
-      // =====================================
       if (billToTrack._id) {
-        const updateBill = await fetch(`http://localhost:9000/trending/track/${billToTrack._id}`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            increment: 1,
-          }),
-          credentials: 'include',
-          headers: {
-          'Content-Type': 'application/json'
-          }
-        });
-        if(!updateBill.ok){
-            throw Error(updateBill.statusText)
-        }
-        const parsedUpdateBill = await updateBill.json();
-        console.log(`Updated bill response from Express API:${JSON.stringify(parsedUpdateBill)}`)
-        // =====================================
-        // MONGO: ADD TO USER'S TRACKED BILLS
-        // =====================================
-        const trackBill = await fetch(`http://localhost:9000/auth/${this.state._id}/track/${billToTrack._id}`, {
+// ==================================================================
+// MONGO: ADD TO USER'S TRACKED BILLS (IF POSSIBLE)
+// ==================================================================
+        const isUserTracking = await fetch(`http://localhost:9000/auth/${this.state._id}/track/${billToTrack._id}`, {
           method: 'PUT',
           // body: JSON.stringify({
           //   increment: 1,
@@ -127,23 +112,43 @@ class App extends Component {
           headers: {
           'Content-Type': 'application/json'
         }});
-        if(!trackBill.ok){
-            throw Error(trackBill.statusText)
+        if(!isUserTracking.ok){
+            throw Error(isUserTracking.statusText)
         }
-        const parsedTrackBill = await trackBill.json();
-        console.log(`Updated bill response from Express API:${JSON.stringify(parsedTrackBill)}`)
-        // =====================================
-        // ADD TO TRACKEDBILLS IN REACT
-        // =====================================
-        this.setState({ 
-          trackedBills: [...this.state.trackedBills, parsedUpdateBill.data],
-        }, function() {
-          console.log(`We are now tracking this bill: ${this.state.trackedBills[this.state.trackedBills.length-1].title}`)
-        });
+        const parsedIsUserTracking = await isUserTracking.json();
+        console.log(`BILL EXISTED, :${JSON.stringify(parsedIsUserTracking)}`)
+// ==================================================================
+// UPDATE COUNT IN MONGO IF USER JUST TRACKED
+// ==================================================================
+        if (parsedIsUserTracking.status == 200) {
+          const updateBill = await fetch(`http://localhost:9000/trending/track/${billToTrack._id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            increment: 1,
+          }),
+          credentials: 'include',
+          headers: {
+          'Content-Type': 'application/json'
+          }
+          });
+          if(!updateBill.ok){
+              throw Error(updateBill.statusText)
+          }
+          const parsedUpdateBill = await updateBill.json();
+          console.log(`Updated bill response from Express API:${JSON.stringify(parsedUpdateBill)}`)
+// ==================================================================
+// ADD TO TRACKEDBILLS IN REACT (BASED ON DB REPLY)
+// ==================================================================
+          this.setState({ 
+            trackedBills: [...this.state.trackedBills, parsedUpdateBill.data],
+          }, function() {
+            console.log(`We are now tracking this bill: ${this.state.trackedBills[this.state.trackedBills.length-1].title}`)
+          });
+        }
       } 
-      // =====================================
-      // IF NO ID, CREATE ONE IN MONGO
-      // =====================================
+// ==================================================================
+// IF NO ID, CREATE ONE IN MONGO (WE KNOW USER HASN'T TRACKED THEN)
+// ==================================================================
       else {
         const createBill = await fetch(`http://localhost:9000/trending/`, {
         method: 'POST',
@@ -163,10 +168,10 @@ class App extends Component {
             throw Error(createBill.statusText)
         }
         const parsedCreateBill = await createBill.json();
-        console.log(`New bill creation in MONGODB:${JSON.stringify(parsedCreateBill)}`)
-        // =====================================
-        // MONGO: ADD TO USER'S TRACKED BILLS
-        // =====================================
+        console.log(`DB CREATED BILL:${JSON.stringify(parsedCreateBill)}`)
+// ==================================================================
+// MONGO: ADD TO USER'S TRACKED BILLS
+// ==================================================================
         const trackBill = await fetch(`http://localhost:9000/auth/${this.state._id}/track/${parsedCreateBill.data._id}`, {
           method: 'PUT',
           // body: JSON.stringify({
@@ -181,24 +186,35 @@ class App extends Component {
         }
         const parsedTrackBill = await trackBill.json();
         console.log(`Updated bill response from Express API:${JSON.stringify(parsedTrackBill)}`)
-        // =====================================
-        // ADD TO TRACKEDBILLS IN REACT
-        // =====================================
+// ==================================================================
+// TRACK BILL IN STATE & UPDATE BILLS ARRAY
+// ==================================================================
+        let updatedArray = [...this.state.bills];
+        for(let i = 0; i < updatedArray.length; i++) {
+          if(updatedArray[i].title == parsedCreateBill.data.title) {
+            updatedArray[i]._id = parsedCreateBill.data._id
+            updatedArray[i].trackingCount = parsedCreateBill.data.trackingCount
+          }
+        }
         this.setState({ 
           trackedBills: [...this.state.trackedBills, parsedCreateBill.data],
+          bills: updatedArray
         }, function() {
-          console.log(`We are now tracking this bill: ${this.state.trackedBills[this.state.trackedBills.length-1].title}`)
+          console.log(`Trying to find index of: ${parsedCreateBill.data.title}, this bill tracked: ${JSON.stringify(this.state.trackedBills[this.state.trackedBills.length-1])}`)
         });
       }
     } catch(err){
       console.log(err)
     }
   }
+// ==================================================================
+// UNTRACK BILL
+// ==================================================================
   untrackBill = async (billId) => {
     try {
-      // =====================================
-      // DECREMENT IN MONGO DATABASE
-      // =====================================
+// ==================================================================
+// DECREMENT IN MONGO DATABASE
+// ==================================================================
       const updateBill = await fetch(`http://localhost:9000/trending/untrack/${billId}`, {
         method: 'PUT',
         body: JSON.stringify({
@@ -213,10 +229,10 @@ class App extends Component {
         throw Error(updateBill.statusText)
       }
       const parsedUpdateBill = await updateBill.json();
-      console.log(`Updated bill response from Express API:${JSON.stringify(parsedUpdateBill)}`)
-      // =====================================
-      // REMOVE FROM USER'S TRACKED BILLS
-      // =====================================
+      console.log(`Updated bill response from Express API:${parsedUpdateBill}`)
+// ==================================================================
+// REMOVE FROM USER'S TRACKED BILLS
+// ==================================================================
       const userUntrackBill = await fetch(`http://localhost:9000/auth/${this.state._id}/untrack/${billId}`, {
         method: 'PUT',
         credentials: 'include',
@@ -228,23 +244,24 @@ class App extends Component {
         throw Error(userUntrackBill.statusText)
       }
       const parsedUntrackBill = await userUntrackBill.json();
-      console.log(`Untracked bill and user shows:${JSON.stringify(parsedUntrackBill)}`)
-      // =========================================
-      // REMOVE FROM TRACKEDBILLS IN REACT
-      // =========================================
-      console.log(`User-tracked bills: ${JSON.stringify(this.state.trackedBills)}.`)
-      let arr = [];
-      this.state.trackedBills.forEach((bill) => {
-        if (bill._id !== billId){
-          arr.push(bill);
-        }
-      })
-      console.log(`arr: ${JSON.stringify(arr)}.`)
-      this.setState({
+      console.log(`Untracked bill and user shows:${parsedUntrackBill}`)
+// ==================================================================
+// REMOVE FROM TRACKEDBILLS IN REACT, IF SUCCESSFUL MONGO DELETE
+// ==================================================================
+      if (parsedUntrackBill.status == 200) {
+        console.log(`User-tracked bills: ${this.state.trackedBills}.`)
+        let arr = [];
+        this.state.trackedBills.forEach((bill) => {
+          if (bill._id !== billId){
+            arr.push(bill);
+          }
+        })
+        this.setState({
         trackedBills: arr
         }, function() {
-        console.log(`React: removed bill ID ${billId}. User-tracked bills: ${JSON.stringify(this.state.trackedBills)}.`)
+        console.log(`React: removed bill ID ${billId}. User-tracked bills: ${this.state.trackedBills}.`)
       });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -306,7 +323,7 @@ class App extends Component {
             <Route exact path="/" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess}/>)}/>
             <Route exact path="/tracking" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} />)}/>
             <Route exact path="/trending" render={(routeProps) => (<TrendingContainer {...routeProps} info={this.state} updateTrending={this.updateTrending} />)}/>
-            <Route exact path="/bills" render={(routeProps) => (<BillContainer {...routeProps} info={this.state} trackedBills={this.state.trackedBills} bills={this.state.bills} addBillToTracking={this.addBillToTracking}/>)}/>
+            <Route exact path="/bills" render={(routeProps) => (<BillContainer {...routeProps} trackedBills={this.state.trackedBills} bills={this.state.bills} addBillToTracking={this.addBillToTracking}/>)}/>
             <Route exact path="/legislators" render={(routeProps) => (<LegislatorContainer {...routeProps} info={this.state} />)}/>
             <Route component={ My404 }/>
           </Switch>
