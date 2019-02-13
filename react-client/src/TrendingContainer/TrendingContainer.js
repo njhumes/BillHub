@@ -1,4 +1,5 @@
 import React from 'react'
+import BillList from '../BillContainer/BillList/BillList'
 
 const TrendingContainer = (props) => {
 
@@ -30,9 +31,7 @@ const TrendingContainer = (props) => {
 
 
   return (
-    <div>
-      {JSON.stringify(props.info.trendingBills)}
-    </div>
+    <BillList addBillToTracking={props.addBillToTracking.bind(this)} bills={props.bills} trackedBills={props.trackedBills} />
   )
 }
 

@@ -31,3 +31,22 @@
     transform: rotate(360deg);
   }
 }
+
+.image {
+  width:40px;
+  height:40px;
+  float:left;
+}
+
+.billCount {
+  width:50px;
+}
+
+.inline {
+  display: inline-block;
+}
+
+.cardInfo {
+  width:200px;
+  display:inline-block;
+}

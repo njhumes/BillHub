@@ -38,7 +38,7 @@ class App extends Component {
       bills: parsedData.tempData,
       trackedBills: [],
       trackedReps: [],
-      trendingBills: [],
+      trendingBills: parsedData.tempData,
       reps: []
       }
   }
@@ -58,14 +58,14 @@ class App extends Component {
         const parsedTopBills = await topBills.json();
         // Update the main state
         this.updateTrending(parsedTopBills.data);
-        console.log(`Trending bills response from Express API:${parsedTopBills}`)
+        console.log(`Trending bills response from Express API:${parsedTopBills.data}`)
     } catch(err){
         console.log(err)
     }
   }
   componentDidMount() {
     // HERE LETS PULL SOME INITIAL DATA: TRENDING
-    this.getTopTrackedBills();
+    //this.getTopTrackedBills();
   }
   handleInput = (e) => {
     this.setState({
@@ -322,7 +322,7 @@ class App extends Component {
           <Switch>
             <Route exact path="/" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess}/>)}/>
             <Route exact path="/tracking" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} />)}/>
-            <Route exact path="/trending" render={(routeProps) => (<TrendingContainer {...routeProps} info={this.state} updateTrending={this.updateTrending} />)}/>
+            <Route exact path="/trending" render={(routeProps) => (<TrendingContainer {...routeProps} addBillToTracking={this.addBillToTracking} bills={this.state.trendingBills} updateTrending={this.updateTrending} trackedBills={this.state.trackedBills} />)}/>
             <Route exact path="/bills" render={(routeProps) => (<BillContainer {...routeProps} trackedBills={this.state.trackedBills} bills={this.state.bills} addBillToTracking={this.addBillToTracking}/>)}/>
             <Route exact path="/legislators" render={(routeProps) => (<LegislatorContainer {...routeProps} info={this.state} />)}/>
             <Route component={ My404 }/>
