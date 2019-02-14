@@ -927,5 +927,56 @@ const tempData2 = [
     "trackingCount" : "0" }
 ];
     
+const tempDataReps = [
+    {
+        "firstname": "Tammy",
+        "lastname": "Baldwin",
+        "state":"WI",
+        "party": "D",
+        "image": "tammy_baldwin.png" },
+    {
+        "firstname": "John",
+        "lastname": "Borasso",
+        "state":"WY",
+        "party": "R",
+        "image": "john_borasso.jpeg",},
+    {
+        "firstname": "Marsha",
+        "lastname": "Blackburn",
+        "state":"TN",
+        "party": "R",
+        "image": "marsha_blackburn.jpg",},
+    {
+        "firstname": "Make",
+        "lastname": "Braun",
+        "state":"IN",
+        "party": "R",
+        "image": "mike_braun.jpeg",},
+    {
+        "firstname": "Thomas",
+        "lastname": "Carper",
+        "state":"DE",
+        "party": "D",
+        "image": "thomas_carper.jpg",},
+    {
+        "firstname": "Sherrod",
+        "lastname": "Brown",
+        "state":"OH",
+        "party": "D",
+        "image": "sherrod_brown.png",},
+    {
+        "firstname": "Maria",
+        "lastname": "Cantwell",
+        "state":"WA",
+        "party": "D",
+        "image": "maria_cantwell.jpg",},
+    {
+        "firstname": "Benjamin",
+        "lastname": "Cardin",
+        "state":"MD",
+        "party": "D",
+        "image": "benjamin_cardin.jpg",}
+]
     
 exports.tempData = tempData2;
+exports.tempDataReps = tempDataReps;

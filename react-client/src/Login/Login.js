@@ -1,72 +1,38 @@
-import React, { Component } from 'react'
-import { Row, Col } from 'reactstrap';
+import React from 'react'
+import { Col, Card, Label, Input, Form, FormGroup } from 'reactstrap';
 
-export class Login extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            username: '',
-            password: ''
-        }
-    }
-    handleChange = (e) => {
-        this.setState({
-            [e.target.name]: e.target.value
-        })
-    }
-    handleSubmit = async (e) => {
-        e.preventDefault();
-    
-        try {
-            const loginResponse = await fetch('http://localhost:9000/auth', {
-                method: 'POST',
-                body: JSON.stringify({
-                    username: this.state.username,
-                    password: this.state.password,
-                    trackedBills: [],
-                    trackedReps: []
-                }),
-                credentials: 'include',
-                headers: {
-                'Content-Type': 'application/json'
-                }
-            });
-        
-            if(!loginResponse.ok){
-                throw Error(loginResponse.statusText)
-            }
-        
-            const parsedResponse = await loginResponse.json();
-        
-            this.props.loginSuccess(JSON.parse(parsedResponse.data));
-        
-            console.log(parsedResponse, ' this is login response from express api')
-        
-        } catch(err){
-            console.log(err)
-        }
-    
-    }
-    render() {
-        return (
-            <Row>
-                <Col>
-                    <form onSubmit={this.handleSubmit}>
-                        <label>
-                            Username:
-                            <input type='text' name='username' onChange={this.handleChange} />
-                        </label>
-                        <label>
-                            Password:
-                            <input type='password' name='password' onChange={this.handleChange} />
-                        </label>
-                        <input type='Submit'/>
-                    </form>
-                </Col>
-            </Row>
-        )
-    }
+const Login = (props) => {
+    return (
+        <Col xs='auto'>
+            <Card body>
+                <Form onSubmit={props.handleLogin.bind(this)}>
+                    <FormGroup>
+                        <Label for="exampleEmail">Username</Label>
+                        <Input type="text" name="username" autocomplete="off" id="exampleUsername" placeholder="" onChange={props.handleChange.bind(this)} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="examplePassword">Password</Label>
+                        <Input type="password" name="password" autocomplete="off" id="examplePassword" placeholder="" onChange={props.handleChange.bind(this)} />
+                    </FormGroup>
+                    <Input className="submit" type="Submit" value="Login"/>
+                </Form>
+            </Card>
+            <br/>
+            <Card body>
+                <Form onSubmit={props.handleRegister.bind(this)}>
+                    <FormGroup>
+                        <Label for="exampleEmail">Username</Label>
+                        <Input type="text" name="username" autocomplete="off" id="exampleUsername" placeholder="" onChange={props.handleChange.bind(this)} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="examplePassword">Password</Label>
+                        <Input type="password" name="password" autocomplete="off" id="examplePassword" placeholder="" onChange={props.handleChange.bind(this)} />
+                    </FormGroup>
+                    <Input className="submit" type="Submit" value="Register"/>
+                </Form>
+            </Card>
+        </Col>
+    )
 }
 
 export default Login

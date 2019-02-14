@@ -13,7 +13,7 @@ const Nav = (props) => {
           <NavItem updateNav={props.updateNav.bind(this)} path="bills"/>
           <NavItem updateNav={props.updateNav.bind(this)} path="legislators"/>
       </nav>
-
+      
     </header>
     )
 }

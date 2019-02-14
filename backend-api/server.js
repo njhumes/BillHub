@@ -31,6 +31,11 @@ app.use('/auth', authController);
 app.use('/bills', billsController);
 app.use('/trending', trendingController);
 
+// HOME PAGE
+app.get('/', (req,res) => {
+  console.log(`loaded the first page`);
+});
+
 app.listen(process.env.PORT || 9000, () => {
   console.log('listening on port 9000');
 });

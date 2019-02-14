@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import { Route, Switch } from 'react-router-dom';
-import { Container } from 'reactstrap';
+import { Container, Row, Col } from 'reactstrap';
 import TrackingContainer from './TrackingContainer/TrackingContainer';
 import Navigation from './Navigation/Navigation';
 import TrendingContainer from './TrendingContainer/TrendingContainer';
@@ -9,10 +9,13 @@ import BillContainer from './BillContainer/BillContainer.js';
 import LegislatorContainer from './LegislatorContainer/LegislatorContainer.js';
 // import Login from './Login/Login.js';
 import SearchBar from './SearchBar/SearchBar';
-// USING TEMP DATA BECAUSE API WONT WORK
 const tempData2 = require('./TempData/TempData');
 const stringData = JSON.stringify(tempData2);
 const parsedData = JSON.parse(stringData);
+const tempDataMaster = require('./TempData/TempDataMaster');
+const stringDataMaster = JSON.stringify(tempDataMaster);
+const parsedDataMaster = JSON.parse(stringDataMaster);
+const masterDatabase = parsedDataMaster.tempData;
 // const statesApiKey = process.env.OPEN_STATES_API_KEY;
 // const federalApiKey = process.env.PRO_PUBLICA_API_KEY;
 
@@ -39,7 +42,7 @@ class App extends Component {
       trackedBills: [],
       trackedReps: [],
       trendingBills: parsedData.tempData,
-      reps: []
+      reps: parsedData.tempDataReps
       }
   }
   getTrendingBills = async () => {
@@ -65,7 +68,8 @@ class App extends Component {
   }
   componentDidMount() {
     // HERE LETS PULL SOME INITIAL DATA: TRENDING
-    //this.getTopTrackedBills();
+    this.getTrendingBills();
+    this.getBillsFromQuery("tax", "Iowa");
   }
   handleInput = (e) => {
     this.setState({
@@ -83,7 +87,7 @@ class App extends Component {
     this.setState({ 
       activePage: page
     }, function() {
-      if (page == "trending"){
+      if (page === "trending"){
         this.getTrendingBills();
       }
     });
@@ -297,20 +301,79 @@ class App extends Component {
       console.log(`Our new state is: ${this.state.trendingBills}`)
     });
   }
-  // getBills = async () => {
+  handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+        const loginResponse = await fetch('http://localhost:9000/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: this.state.username,
+                password: this.state.password,
+                trackedBills: [],
+                trackedReps: []
+            }),
+            credentials: 'include',
+            headers: {
+            'Content-Type': 'application/json'
+            }
+        });
+        if(!loginResponse.ok){
+            throw Error(loginResponse.statusText)
+        }
+        const parsedResponse = await loginResponse.json();
+        console.log(parsedResponse, ' this is login response from express api')
+        if (parsedResponse.status === 200){
+          this.loginSuccess(JSON.parse(parsedResponse.data));
+        }
+    } catch(err){
+        console.log(err)
+    }
+  }
+  handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+        const loginResponse = await fetch('http://localhost:9000/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                username: this.state.username,
+                password: this.state.password,
+                trackedBills: [],
+                trackedReps: []
+            }),
+            credentials: 'include',
+            headers: {
+            'Content-Type': 'application/json'
+            }
+        });
+        if(!loginResponse.ok){
+            throw Error(loginResponse.statusText)
+        }
+        const parsedResponse = await loginResponse.json();
+        console.log(parsedResponse, ' this is login response from express api')
+        if (parsedResponse.status === 200) {
+          this.loginSuccess(JSON.parse(parsedResponse.data));
+        }
+    } catch(err){
+        console.log(err)
+    }
+  }
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value
+    })
+  }
+  // getBillsFromApi = async () => {
   //   try {
 
   //     const cors_api_host = 'cors-anywhere.herokuapp.com';
   //     const cors_api_url = 'https://' + cors_api_host + '/';
-  //     const query = "{bills(last:2){edges{node{title}}}}";
-
-  //     const response = await fetch(`${cors_api_url}https://openstates.org/api/v1/legislators/?state=dc&chamber=upper`, {
-  //       method: 'GET',
-  //       // credentials: 'include',
+  //     //const query = "{bills%28jurisdiction:%22Colorado%22,first:10%29{edges{node{title,subject,legislativeSession{jurisdiction{name}},createdAt,updatedAt,abstracts{abstract}}}}}";
+  //     //const queryTest = "%7Bbills(jurisdiction%3A%20%22Colorado%22%2C%20first%3A%2010)%7Bedges%7Bnode%7Btitle%2Csubject%2ClegislativeSession%7Bjurisdiction%7Bname%7D%7D%2CcreatedAt%2CupdatedAt%2Cabstracts%7Babstract%7D%7D%7D%7D%7D&operationName=null";
+  //     //const queryTest2 = {bills(jurisdiction:"Colorado",first:10){edges{node{title,subject,legislativeSession{jurisdiction{name}},createdAt,updatedAt,abstracts{abstract}}}}};
+  //     const response = await fetch(`${cors_api_url}https://openstates.org/api/v1/bills/apikey=70a944df-df9d-48e6-b38a-29b09cd7c3db?state=co&per_page=10`, {
+  //       method: 'POST',
   //       headers: {
-  //         'X-API-KEY': statesApiKey,
-  //         // 'Content-Type': 'application/json',
-  //         // "X-Requested-With": 'XMLHttpRequest'
+  //         'content-type': 'application/json',
   //       },
   //     });
 
@@ -329,25 +392,36 @@ class App extends Component {
   //     return err
   //   }
   // }
+  getBillsFromQuery = (query, filter) => {
+    function checkQueryAndState(item) {
+      return item.node.legislativeSession.jurisdiction.name == filter && ( item.node.abstracts.includes(query) || item.node.title.includes(query) );
+    }
+    const returnedBills = masterDatabase.filter(checkQueryAndState)
+    console.log(returnedBills);
+  }
   render() {
     return (
       <div id="container">
 
         {/* NAVIGATION */}
-        <Navigation updateNav={this.updateNav}/>
+        <Navigation updateNav={this.updateNav}/> <br/>
 
         <Container>
         {/* SEARCH BAR - DEFAULT 1ST BUTTON */}
-        <SearchBar onRadioBtnClick={this.onRadioBtnClick} selected={this.state.queryBtn} handleInput={this.handleInput}/>
+        <Row className="justify-content-center">
+          <Col xs={{size: 'auto'}}>
+            <SearchBar onRadioBtnClick={this.onRadioBtnClick} selected={this.state.queryBtn} handleInput={this.handleInput}/>
+          </Col>
+        </Row> <br/>
 
         {/* MAIN CONTENT */}
         <main>
           <Switch>
-            <Route exact path="/" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess}/>)}/>
-            <Route exact path="/tracking" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} />)}/>
+            <Route exact path="/" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} handleLogin={this.handleLogin} handleRegister={this.handleRegister} handleChange={this.handleChange}/>)}/>
+            <Route exact path="/tracking" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} handleLogin={this.handleLogin} handleRegister={this.handleRegister} handleChange={this.handleChange}/>)}/>
             <Route exact path="/trending" render={(routeProps) => (<TrendingContainer {...routeProps} addBillToTracking={this.addBillToTracking} bills={this.state.trendingBills} updateTrending={this.updateTrending} trackedBills={this.state.trackedBills} />)}/>
             <Route exact path="/bills" render={(routeProps) => (<BillContainer {...routeProps} trackedBills={this.state.trackedBills} bills={this.state.bills} addBillToTracking={this.addBillToTracking}/>)}/>
-            <Route exact path="/legislators" render={(routeProps) => (<LegislatorContainer {...routeProps} info={this.state} />)}/>
+            <Route exact path="/legislators" render={(routeProps) => (<LegislatorContainer {...routeProps} info={this.state.reps} />)}/>
             <Route component={ My404 }/>
           </Switch>
         </main>

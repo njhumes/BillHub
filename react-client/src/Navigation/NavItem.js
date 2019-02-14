@@ -5,11 +5,12 @@ const NavItem = (props) => {
 
     let currPage = props.path.charAt(0).toUpperCase() + props.path.substring(1,props.path.length)
     let itemClass = "nav-item nav-link";
-    let isActive = window.location.pathname === props.path;
-    let className = isActive ? itemClass + ' active' : itemClass;
+    if (window.location.pathname === "/" + props.path){
+        itemClass += " active"
+    }
 
     return (
-        <Link to={'/' + props.path} onClick={props.updateNav.bind(this,props.path)} className={className}>{currPage}</Link>
+        <Link to={'/' + props.path} onClick={props.updateNav.bind(this,props.path)} className={itemClass}> {currPage} </Link>
     )
 }
 
