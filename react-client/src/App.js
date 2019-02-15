@@ -58,7 +58,8 @@ class App extends Component {
     this.state = {
       dropdownOpen: false,
       logged: false,
-      failedEntry: false,
+      failedLogin: false,
+      failedRegister: false,
       _id: null,
       userState: "CO",
       activePage: 'tracking',
@@ -107,8 +108,8 @@ class App extends Component {
 //                             PULL INITIAL DATA FOR TRENDING AND BILL PAGES
 // ================================================================================================================  
   componentDidMount() {
-    this.getTrendingBills();
-    this.getBillsFromQuery("tax", "Iowa");
+    //this.getTrendingBills();
+    //this.getBillsFromQuery();
   }
 // ================================================================================================================
 //                                  CHANGE QUERY STATE WHEN USER TYPES
@@ -246,9 +247,6 @@ class App extends Component {
 // ==================================
         const trackBill = await fetch(`http://localhost:9000/auth/${this.state._id}/track/${parsedCreateBill.data._id}`, {
           method: 'PUT',
-          // body: JSON.stringify({
-          //   increment: 1,
-          // }),
           credentials: 'include',
           headers: {
           'Content-Type': 'application/json'
@@ -394,6 +392,10 @@ class App extends Component {
         console.log('THIS IS THE ID', id);
         if (parsedResponse.status === 200){
           this.loginSuccess(id, tracked);
+        } else {
+          this.setState({
+            failedRegister: true
+          });
         }
     } catch(err){
         console.log(err)
@@ -429,7 +431,7 @@ class App extends Component {
           this.loginSuccess(id, tracked);
         } else {
           this.setState({
-            failedEntry: true
+            failedLogin: true
           })
         }
     } catch(err){
@@ -476,10 +478,15 @@ class App extends Component {
 // THIS SHOULD QUERY THE API WITH USER INPUT
 // ====================================================================================================================
 
-getBillsFromQuery = async () => {
+getBillsFromQuery = async (e) => {
+  e.preventDefault();
+
   const query = this.state.query;
   let state = "";
   switch (this.state.userState) {
+    case "ALL":
+      state = "All";
+      break;
     case "CO":
       state = "Colorado";
       break;
@@ -492,7 +499,7 @@ getBillsFromQuery = async () => {
   }
 
   function checkQueryAndState(item) {
-    if (state) {
+    if (state && state != "All") {
       return (item.state == state && ( item.summary.includes(query) || item.title.includes(query) ));
     } else {
       return ( item.summary.includes(query) || item.title.includes(query) );
@@ -518,7 +525,7 @@ getBillsFromQuery = async () => {
 
       try {
         const findBill = await fetch('http://localhost:9000/bills/findBill', {
-            method: 'POST',
+            method: 'GET',
             body: JSON.stringify({
                 title: returnedBills[i].title,
             }),
@@ -533,7 +540,7 @@ getBillsFromQuery = async () => {
         }
 
         const parsedResponse = await findBill.json();
-        if (parsedResponse.stats == 200) {
+        if (parsedResponse.status == 200) {
           returnedBills[i] = parsedResponse.data;
         }
         console.log('FOUND BILL FROM EXPRESS TO GRAB INFO FOR:', parsedResponse);
@@ -626,7 +633,8 @@ changeState = (e) => {
           <Switch>
             <Route exact path="/" render={(routeProps) => (
               <TrackingContainer {...routeProps} 
-                failedEntry={this.state.failedEntry} 
+                failedLogin={this.state.failedEntry}
+                failedRegister={this.state.failedRegister}
                 info={this.state.logged} 
                 trackedBills={this.state.trackedBills} 
                 trackedReps={this.state.trackedReps} 
@@ -639,7 +647,8 @@ changeState = (e) => {
 
             <Route exact path="/tracking" render={(routeProps) => 
               (<TrackingContainer {...routeProps} 
-              failedEntry={this.state.failedEntry} 
+              failedLogin={this.state.failedLogin} 
+              failedRegister={this.state.failedRegister}
               info={this.state.logged} 
               trackedBills={this.state.trackedBills} 
               trackedReps={this.state.trackedReps} 

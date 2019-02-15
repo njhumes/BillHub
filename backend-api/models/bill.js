@@ -6,7 +6,7 @@ const BillSchema = new mongoose.Schema({
   state: {type:String, required: true},
   proposed: Date,
   lastAction: Date,
-  trackingCount: Number
+  trackingCount: { type: Number, min: 0 }
 });
 
 module.exports = mongoose.model('Bill', BillSchema);

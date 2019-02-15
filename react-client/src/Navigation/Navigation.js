@@ -5,7 +5,10 @@ const Nav = (props) => {
   return (
     <header>
       {/* BILLHUB HEADER */}
-      <a className="navbar-brand" href="#"><img src="https://unsplash.com/photos/InsHJ5sg2vc"/><span>BillHub</span></a>
+      <a className="navbar-brand">
+        <img className="appIcon" src={"/images/simpleGavel.png"}/>
+        <span className="brandName">BillHub</span>
+      </a>
 
       <nav className="nav nav-pills nav-fill">
           <NavItem updateNav={props.updateNav.bind(this)} path="tracking"/>

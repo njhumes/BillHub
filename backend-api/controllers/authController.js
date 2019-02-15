@@ -23,18 +23,27 @@ router.post('/register', async (req, res) => {
 // CREATE USER IF NOT TAKEN
 // ==========================
     if (!usernameTaken) {
-      const user = await User.create(userDbEntry);
-      req.session.username = user.username;
-      req.session.logged = true;
-      req.session.userId = user._id;
-      res.json({
-        status: 200,
-        data: JSON.stringify({
-            session : req.session,
-            userId: user._id,
-            trackedBills: user.trackedBills
-        })
-      });  
+      if (req.body.username && req.body.password) {
+        const user = await User.create(userDbEntry);
+        req.session.username = user.username;
+        req.session.logged = true;
+        req.session.userId = user._id;
+        res.json({
+          status: 200,
+          data: JSON.stringify({
+              session : req.session,
+              userId: user._id,
+              trackedBills: user.trackedBills
+          })
+        }); 
+      } else {
+        console.log("USERNAME TAKEN.");
+        res.json({
+          status: 406,
+          data: JSON.stringify({
+            message : 'USERNAME TAKEN'})
+        });  
+      }
     } else {
       console.log("USERNAME TAKEN.");
       res.json({

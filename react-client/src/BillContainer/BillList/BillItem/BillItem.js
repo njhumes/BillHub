@@ -19,6 +19,7 @@ export class BillItem extends Component {
             this.props.addBillToTracking(billInfo);
         } else {
             // PROMPT THE USER TO LOGIN
+            alert("You need to log in to follow bills!")
         }
     }
     untrackBill(billId){
@@ -30,15 +31,18 @@ export class BillItem extends Component {
             this.props.untrackBill(billId)
         } else {
             // PROMPT THE USER TO LOGIN
+            alert("You need to log in to follow bills!")
         }
     }
     render(){
         return (
             <Card className="grayCard" body>
                 <Row>
-                    <Col xs="1">
+                    <Col xs="2" md="1">
                         <div className="centerButton">
-                            <h1 className="trackingCount">{this.props.billInfo.trackingCount}</h1>
+                            <div >
+                                <h1 className="trackingCount">{this.props.billInfo.trackingCount}</h1>
+                            </div>
                             <figure> 
                                 <img onClick={
                                     !this.state.trackedStatus ? 
@@ -58,14 +62,23 @@ export class BillItem extends Component {
                             </Button> */}
                         </div>
                     </Col>
-                    <Col sm="11">
-                        <CardTitle><h4>{this.props.billInfo.title}</h4></CardTitle>
-                        <CardText>
-                            {this.props.billInfo.summary.length > 300 ? 
-                                this.props.billInfo.summary.slice(0,370) + "..." : 
-                                this.props.billInfo.summary
-                            }
-                        </CardText>
+                    <Col xs="10" md="11">
+                        <div className="cardContent">
+                            <CardTitle>
+                                <h4>
+                                    {this.props.billInfo.title.length > 80 ? 
+                                        this.props.billInfo.title.slice(0,80) + "..." : 
+                                        this.props.billInfo.title
+                                    }
+                                </h4>
+                            </CardTitle>
+                            <CardText className="cardText">
+                                {this.props.billInfo.summary.length > 300 ? 
+                                    this.props.billInfo.summary.slice(0,300) + "..." : 
+                                    this.props.billInfo.summary
+                                }
+                            </CardText>
+                        </div>
                     </Col>
                 </Row>
             </Card>

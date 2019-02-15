@@ -16,6 +16,7 @@ const SearchBar = (props) => {
                             </DropdownToggle>
                             <DropdownMenu onClick={props.changeState.bind(this)}>
                             <DropdownItem></DropdownItem>
+                            <DropdownItem name="ALL" active={props.userState === "ALL"}>ALL</DropdownItem>
                             <DropdownItem name="AL" active={props.userState === "AL"}>AL</DropdownItem>
                             <DropdownItem name="AK" active={props.userState === "AK"}>AK</DropdownItem>
                             <DropdownItem name="AZ" active={props.userState === "AZ"}>AZ</DropdownItem>
@@ -82,7 +83,7 @@ const SearchBar = (props) => {
                         <InputGroup>
                             <Input placeholder="username" onChange={props.handleInput.bind(this)} />
                         </InputGroup>
-                        <Input className="submit" type="Submit" value="Search"/>
+                        <Input type="Submit" value="Search"/>
                     </Form>
                 </Col>
             </Row>

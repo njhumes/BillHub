@@ -3,7 +3,7 @@ const router = express.Router();
 const Bill = require('../models/bill');
 
 // FIND A BILL
- router.post('/findBill', async (req, res, next) => {
+ router.get('/findBill', async (req, res, next) => {
   console.log(`WE SENT ${req.body.title} AS THE TITLE TO CHECK`)
 
   try  {
@@ -29,8 +29,8 @@ const Bill = require('../models/bill');
 
 
 // CREATE ROUTE
-router.post('/', async (req, res) => {
-  try {
+// router.post('/', async (req, res) => {
+//   try {
     // console.log(req.body, ' this is req.body');
     // const createdMovie = await Movie.create(req.body);
     // console.log('response happening?')
@@ -38,11 +38,11 @@ router.post('/', async (req, res) => {
     //   status: 200,
     //   data: createdMovie
     // });
-  } catch(err){
-    console.log(err);
-    res.send(err);
-  }
-});
+//   } catch(err){
+//     console.log(err);
+//     res.send(err);
+//   }
+// });
 
 // SHOW ROUTE
 router.get('/:id', async (req, res, next) => {
