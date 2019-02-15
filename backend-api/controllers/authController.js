@@ -30,7 +30,9 @@ router.post('/register', async (req, res) => {
       res.json({
         status: 200,
         data: JSON.stringify({
-          user : user._id
+            session : req.session,
+            userId: user._id,
+            trackedBills: user.trackedBills
         })
       });  
     } else {
@@ -69,7 +71,9 @@ router.post('/login', async (req, res) => {
         res.json({
           status: 200,
           data: JSON.stringify({
-            session : req.session
+            session : req.session,
+            userId: foundUser._id,
+            trackedBills: foundUser.trackedBills
           })
         });
       } else {
@@ -176,7 +180,10 @@ router.put('/:userid/untrack/:id', async (req, res) => {
       }
       return res.json({
         status: 200,
-        data: 'UNTRACKED BILL SUCCESS'
+        data: {
+          _id: req.params.id,
+          message: 'UNTRACKED BILL SUCCESS'
+        }
       });
     })
   } catch(err){

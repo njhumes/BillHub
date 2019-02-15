@@ -2,20 +2,27 @@ const express = require('express');
 const router = express.Router();
 const Bill = require('../models/bill');
 
-// INDEX ROUTE
- router.get('/', async (req, res, next) => {
-  // req.body this is from the fetch request
-  console.log(req.body, ' this is get all')
-     try  {
-    // const allMovies = await Movie.find();
-    // This is the response to react
-    //   res.json({
-    //     status: 200,
-    //     data: allMovies
-    //   });
-    } catch (err){
-      res.send(err)
+// FIND A BILL
+ router.post('/findBill', async (req, res, next) => {
+  console.log(`WE SENT ${req.body.title} AS THE TITLE TO CHECK`)
+
+  try  {
+  const thisBill = await Bill.findOne({ title : req.body.title });
+    if (thisBill) {
+      res.json({
+        status: 200,
+        message: 'FOUND BILL',
+        data: thisBill
+      });
+    } else {
+      res.json({
+        status: 400,
+        message: 'DIDNT FIND BILL',
+      });
     }
+  } catch (err){
+    res.send(err)
+  }
 });
 
 // EDIT ROUTE
