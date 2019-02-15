@@ -26,7 +26,6 @@ const authController  = require('./controllers/authController');
 const billsController  = require('./controllers/billsController');
 const trendingController  = require('./controllers/trendingController');
 
-// app.use('/api/v1/movies', movieController);
 app.use('/auth', authController);
 app.use('/bills', billsController);
 app.use('/trending', trendingController);
