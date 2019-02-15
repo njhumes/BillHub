@@ -64,3 +64,11 @@
   color: black;
   background-color:rgb(240, 240, 240);
 }
+
+.grayCard {
+  background-color: #F7F7F7;
+}
+
+.starIcon {
+  width: 70px;
+}

@@ -341,7 +341,7 @@ const tempDataMaster = [
 },
 {
     "node": {
-        "title": "Bill History for House File 136Journal Actions Only    \r\n                Floor Managers: Sinclair, Rogers\r\n                Lobbyist Declarations\r\n                All Related Bills to Selected Bill\r\n                LSB 2206YCHSB55\r\n                LSB 2206XCSSB1028\r\n                LSB 2206SVSF166\r\n                        \r\n            (C)SF166         \r\n                    \r\n        \r\n        By COMMITTEE ON APPROPRIATIONS \r\n        A bill for an act relating to the state school foundation program, by modifying requirements for the enactment of the state percents of growth, establishing state percents of growth, modifying provisions relating to school district property tax replacement payments, and including effective date and applicability provisions. (Formerly HSB 55.)",
+        "title": "House File 136",
         "legislativeSession": {
             "jurisdiction": {
                 "name": "Iowa"
@@ -349,12 +349,16 @@ const tempDataMaster = [
         },
         "createdAt": "2017-07-12 07:01:47.727620+00:00",
         "updatedAt": "2018-11-20 13:54:10.067710+00:00",
-        "abstracts": []
+        "abstracts": [
+            {
+                "abstract": "A bill for an act relating to the state school foundation program, by modifying requirements for the enactment of the state percents of growth, establishing state percents of growth, modifying provisions relating to school district property tax replacement payments, and including effective date and applicability provisions. (Formerly HSB 55.)"
+            }
+        ]
     }
 },
 {
     "node": {
-        "title": "Bill History for House File 2499Journal Actions Only    \r\n                Floor Managers: Guth, Landon\r\n                Lobbyist Declarations\r\n                All Related Bills to Selected Bill\r\n                LSB 5027XCSSB3219\r\n                LSB 5027SVSF2416\r\n                LSB 5027HBHSB699\r\n                        \r\n             (S)SF2416        \r\n                    \r\n        \r\n        By COMMITTEE ON APPROPRIATIONS \r\n        A bill for an act relating to and making appropriations and related statutory changes involving certain state departments, agencies, funds, and certain other entities, providing for regulatory authority, and other properly related matters. (Formerly HSB 699.)",
+        "title": "House File 2499",
         "legislativeSession": {
             "jurisdiction": {
                 "name": "Iowa"
@@ -362,12 +366,16 @@ const tempDataMaster = [
         },
         "createdAt": "2018-05-02 07:54:11.002989+00:00",
         "updatedAt": "2018-11-20 13:52:10.617672+00:00",
-        "abstracts": []
+        "abstracts": [
+            {
+                "abstract": "A bill for an act relating to and making appropriations and related statutory changes involving certain state departments, agencies, funds, and certain other entities, providing for regulatory authority, and other properly related matters. (Formerly HSB 699.)",
+            }
+        ]
     }
 },
 {
     "node": {
-        "title": "Bill History for Senate File 211Journal Actions Only    \r\n                Floor Managers: Zumbach, Best\r\n                Lobbyist Declarations\r\n                All Related Bills to Selected Bill\r\n                LSB 1368SVSF406\r\n                        \r\n             (S)SF406        \r\n                    \r\n        \r\n        By  Zumbach\r\n        A bill for an act prohibiting the department of transportation and local authorities from requiring permits for the operation of motor vehicles transporting an implement of husbandry between fields, locations for repair, or locations for storage. (See SF 406.)",
+        "title": "Senate File 211",
         "legislativeSession": {
             "jurisdiction": {
                 "name": "Iowa"
@@ -375,7 +383,11 @@ const tempDataMaster = [
         },
         "createdAt": "2017-07-12 07:01:31.313403+00:00",
         "updatedAt": "2018-11-14 13:53:57.343136+00:00",
-        "abstracts": []
+        "abstracts": [
+            {
+                "abstract":"A bill for an act prohibiting the department of transportation and local authorities from requiring permits for the operation of motor vehicles transporting an implement of husbandry between fields, locations for repair, or locations for storage. (See SF 406.)",
+            }
+        ]
     }
 },
 {
@@ -393,7 +405,7 @@ const tempDataMaster = [
 },
 {
     "node": {
-        "title": "Bill History for House File 250Journal Actions Only    \r\n                Lobbyist Declarations\r\n            \r\n        \r\n        By  Carlin, McKean and Fisher\r\n        A bill for an act providing a property assessment adjustment and a property tax adjustment for certain property of persons who have attained the age of sixty-five, applying income limitations, providing a penalty, and including retroactive and other applicability provisions.",
+        "title": "House File 250",
         "legislativeSession": {
             "jurisdiction": {
                 "name": "Iowa"
@@ -401,7 +413,11 @@ const tempDataMaster = [
         },
         "createdAt": "2017-07-12 07:01:41.488032+00:00",
         "updatedAt": "2018-11-14 13:53:26.667039+00:00",
-        "abstracts": []
+        "abstracts": [
+            {
+                "abstract":"A bill for an act providing a property assessment adjustment and a property tax adjustment for certain property of persons who have attained the age of sixty-five, applying income limitations, providing a penalty, and including retroactive and other applicability provisions.",
+            }
+        ]
     }
 },
 {

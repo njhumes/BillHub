@@ -27,7 +27,7 @@ const TrackingContainer = (props) => {
     return (
         <Row className="justify-content-center" >
             { !props.info ? (
-                <Login handleRegister={props.handleRegister.bind(this)} handleChange={props.handleChange.bind(this)} handleLogin={props.handleLogin} loginSuccess={props.loginSuccess}/>
+                <Login failedEntry={props.failedEntry} handleRegister={props.handleRegister.bind(this)} handleChange={props.handleChange.bind(this)} handleLogin={props.handleLogin} loginSuccess={props.loginSuccess}/>
             ) : (
                 <Col>
                     <hr/>

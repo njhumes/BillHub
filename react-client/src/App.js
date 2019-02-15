@@ -19,13 +19,36 @@ const masterDatabase = parsedDataMaster.tempData;
 // const statesApiKey = process.env.OPEN_STATES_API_KEY;
 // const federalApiKey = process.env.PRO_PUBLICA_API_KEY;
 
+// =================================
+// CLEANING DATA FOR USE
+// =================================
+let cleanedData = [];
+const data = masterDatabase.forEach((element) => {
+  let summary = "";
+  if (element.node.abstracts[0]) {
+    summary = element.node.abstracts[0].abstract;
+  }
+  let cleanedObj = {
+    title: element.node.title,
+    summary: summary,
+    state: element.node.legislativeSession.jurisdiction.name,
+    proposed: element.node.createdAt.slice(0,-13),
+    lastAction: element.node.updatedAt.slice(0,-13),
+    trackingCount: 0,
+  }
+  cleanedData.push(cleanedObj);
+})
+console.log(`OUR DATA FORMAT EXAMPLE: ${JSON.stringify(cleanedData[0])}`);
+
+// =================================
 // ERROR 404
+// =================================
 const My404 = () => {
   return (
     <div>
       You are lost!!!
     </div>
-    )
+  )
 }
 
 class App extends Component {
@@ -34,17 +57,21 @@ class App extends Component {
 
     this.state = {
       logged: false,
+      failedEntry: false,
       _id: null,
       activePage: 'tracking',
       query: '',
       queryBtn: 1,
-      bills: parsedData.tempData,
+      bills: [],
       trackedBills: [],
       trackedReps: [],
       trendingBills: parsedData.tempData,
       reps: parsedData.tempDataReps
       }
   }
+// =====================================
+// PULL MOST TRACKED BILLS FROM DATABASE
+// =====================================
   getTrendingBills = async () => {
     try {
         const topBills = await fetch('http://localhost:9000/trending', {
@@ -59,7 +86,9 @@ class App extends Component {
             throw Error(topBills.statusText)
         }
         const parsedTopBills = await topBills.json();
-        // Update the main state
+        // ===================================
+        // UPDATE STATE WITH TRENDING BILLS
+        // ===================================
         this.updateTrending(parsedTopBills.data);
         console.log(`Trending bills response from Express API:${parsedTopBills.data}`)
     } catch(err){
@@ -74,13 +103,16 @@ class App extends Component {
   handleInput = (e) => {
     this.setState({
       query: e.target.value
+    }, function(){
+      console.log(`SEARCHBAR SHOWS: ${this.state.query}`)
     });
   }
   onRadioBtnClick = (btn) => {
     this.setState({ 
       queryBtn: btn
+    }, function() {
+      console.log(`Radio Button should now be: ${this.state.queryBtn}`);
     });
-    console.log(`Radio Button should now be: ${this.state.queryBtn}`);
   }
   updateNav = (page) => {
     // If path is trending, then get trending bills
@@ -95,12 +127,18 @@ class App extends Component {
 // ==================================================================
 // UPDATE STATE WITH SUCCESSFUL LOGIN
 // ==================================================================
-  loginSuccess = (userId) => {
+  loginSuccess = (userId, trackedBills) => {
+    let tracked = [];
+    if (trackedBills) {
+      tracked = trackedBills
+    }
     this.setState({
       logged: true,
-      _id: userId.user
+      failedEntry: false,
+      _id: userId,
+      trackedBills: tracked
     }, function() {
-      console.log(`Log in success! State shows logged = ${this.state.logged} and userID = ${this.state._id}`);
+      console.log(`LOGGED IN. LOGGED: ${this.state.logged}, ID: ${this.state._id}, BILLS: ${this.state.trackedBills}`);
     });
   }
   addBillToTracking = async (billToTrack) => {
@@ -122,10 +160,9 @@ class App extends Component {
           'Content-Type': 'application/json'
         }});
         if(!isUserTracking.ok){
-            throw Error(isUserTracking.statusText)
+          throw Error(isUserTracking.statusText)
         }
         const parsedIsUserTracking = await isUserTracking.json();
-        console.log(`BILL EXISTED, :${JSON.stringify(parsedIsUserTracking)}`)
 // ==================================================================
 // UPDATE COUNT IN MONGO IF USER JUST TRACKED
 // ==================================================================
@@ -144,7 +181,7 @@ class App extends Component {
               throw Error(updateBill.statusText)
           }
           const parsedUpdateBill = await updateBill.json();
-          console.log(`Updated bill response from Express API:${JSON.stringify(parsedUpdateBill)}`)
+          console.log(`INCREMENTED BILL ID ${JSON.stringify(parsedUpdateBill.data._id)}`)
 // ==================================================================
 // ADD TO TRACKEDBILLS IN REACT (BASED ON DB REPLY)
 // ==================================================================
@@ -159,8 +196,11 @@ class App extends Component {
             trackedBills: [...this.state.trackedBills, parsedUpdateBill.data],
             bills: updatedArray
           }, function() {
-            console.log(`We are now tracking this bill: ${this.state.trackedBills[this.state.trackedBills.length-1].title}`)
+            console.log(`TRACKING BILL ${this.state.trackedBills[this.state.trackedBills.length-1]._id}`);
+            this.getTrendingBills();
           });
+        } else {
+          console.log(`ALREADY TRACKING BILL ${billToTrack._id}`)
         }
       } 
 // ==================================================================
@@ -217,7 +257,8 @@ class App extends Component {
           trackedBills: [...this.state.trackedBills, parsedCreateBill.data],
           bills: updatedArray
         }, function() {
-          console.log(`Trying to find index of: ${parsedCreateBill.data.title}, this bill tracked: ${JSON.stringify(this.state.trackedBills[this.state.trackedBills.length-1])}`)
+          console.log(`TRACKING BILL ID ${this.state.trackedBills[this.state.trackedBills.length-1]._id}`);
+          this.getTrendingBills();
         });
       }
     } catch(err){
@@ -261,12 +302,16 @@ class App extends Component {
         throw Error(userUntrackBill.statusText)
       }
       const parsedUntrackBill = await userUntrackBill.json();
-      console.log(`Untracked bill and user shows:${parsedUntrackBill}`)
+      console.log(`UNTRACKED BILL ${JSON.stringify(parsedUntrackBill.data._id)}`)
 // ==================================================================
-// REMOVE FROM TRACKEDBILLS IN REACT, IF SUCCESSFUL MONGO DELETE
+// REMOVE FROM TRACKEDBILLS IN REACT, IF SUCCESSFUL MONGO DELETION
 // ==================================================================
       if (parsedUntrackBill.status == 200) {
-        console.log(`User-tracked bills: ${this.state.trackedBills}.`)
+        let billIds = [];
+        for (let i=0; i<this.state.trackedBills; i++){
+          billIds.push(this.state.trackedBills[i]._id)
+        }
+        console.log(`TRACKED BILLS: ${JSON.stringify(billIds)}`)
 
         let arr = [];
         this.state.trackedBills.forEach((bill) => {
@@ -286,7 +331,12 @@ class App extends Component {
           trackedBills: arr,
           bills: updatedArray
         }, function() {
-          console.log(`React: removed bill ID ${billId}. User-tracked bills: ${this.state.trackedBills}.`)
+          let billIds = [];
+          for (let i=0; i<this.state.trackedBills; i++){
+            billIds.push(this.state.trackedBills[i]._id)
+          }
+          console.log(`UNTRACKED BILL ${billId} TRACKED BILLS: ${billIds}.`);
+          this.getTrendingBills();
       });
       }
     } catch (err) {
@@ -321,9 +371,14 @@ class App extends Component {
             throw Error(loginResponse.statusText)
         }
         const parsedResponse = await loginResponse.json();
-        console.log(parsedResponse, ' this is login response from express api')
+        console.log('UNFILTERED RESPONSE FROM EXPRESS', loginResponse);
+        console.log('JSON RESPONSE FROM EXPRESS', parsedResponse);
+        const jsonString = parsedResponse.data;
+        const id = JSON.parse(jsonString).userId;
+        const tracked = JSON.parse(jsonString).trackedBills;
+        console.log('THIS IS THE ID', id);
         if (parsedResponse.status === 200){
-          this.loginSuccess(JSON.parse(parsedResponse.data));
+          this.loginSuccess(id, tracked);
         }
     } catch(err){
         console.log(err)
@@ -349,9 +404,18 @@ class App extends Component {
             throw Error(loginResponse.statusText)
         }
         const parsedResponse = await loginResponse.json();
-        console.log(parsedResponse, ' this is login response from express api')
-        if (parsedResponse.status === 200) {
-          this.loginSuccess(JSON.parse(parsedResponse.data));
+        console.log('UNFILTERED RESPONSE FROM EXPRESS', loginResponse);
+        console.log('JSON RESPONSE FROM EXPRESS', parsedResponse);
+        const jsonString = parsedResponse.data;
+        const id = JSON.parse(jsonString).userId;
+        const tracked = JSON.parse(jsonString).trackedBills;
+        console.log('THIS IS THE ID', id);
+        if (parsedResponse.status === 200){
+          this.loginSuccess(id, tracked);
+        } else {
+          this.setState({
+            failedEntry: true
+          })
         }
     } catch(err){
         console.log(err)
@@ -360,6 +424,8 @@ class App extends Component {
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
+    }, function() {
+      // console.log(`SEARCH SHOWS: ${this.state.query}`)
     })
   }
   // getBillsFromApi = async () => {
@@ -392,13 +458,120 @@ class App extends Component {
   //     return err
   //   }
   // }
-  getBillsFromQuery = (query, filter) => {
-    function checkQueryAndState(item) {
-      return item.node.legislativeSession.jurisdiction.name == filter && ( item.node.abstracts.includes(query) || item.node.title.includes(query) );
-    }
-    const returnedBills = masterDatabase.filter(checkQueryAndState)
-    console.log(returnedBills);
+
+// ====================================================================================================================
+// THIS SHOULD QUERY THE API WITH USER INPUT
+// ====================================================================================================================
+
+getBillsFromQuery = async () => {
+  const query = this.state.query;
+  let state = "";
+  if (this.state.queryBtn === 2){
+    state = "Colorado";
   }
+
+  function checkQueryAndState(item) {
+    if (state) {
+      return (item.state == state && ( item.summary.includes(query) || item.title.includes(query) ));
+    } else {
+      return ( item.summary.includes(query) || item.title.includes(query) );
+    }
+  }
+  let returnedBills = cleanedData.filter(checkQueryAndState)
+  let billTitleList = [];
+  for (let i=0; i<returnedBills.length;i++){
+    billTitleList.push(returnedBills[i].title.slice(0,5) + "...")
+  }
+  console.log(`BILLS FROM API QUERY: ${JSON.stringify(billTitleList)}`);
+// ===========================================================
+// LOOK FOR API BILLS IN MONGO TO PULL TRACKING INFO IF NEEDED
+// ===========================================================
+  for (let i=0; i<returnedBills.length; i++) {
+
+      try {
+        const findBill = await fetch('http://localhost:9000/bills/findBill', {
+            method: 'POST',
+            body: JSON.stringify({
+                title: returnedBills[i].title,
+            }),
+            credentials: 'include',
+            headers: {
+            'Content-Type': 'application/json'
+            }
+        });
+        // ,function(){
+        //   if (findBill){
+            // returnedBills[i] = findBill.data;
+            // console.log(`INJECTED DATA INTO BILL ARRAY: ${JSON.stringify(findBill.data)}`)
+            // console.log(`FOUND THIS BILL IN MONGO: ${JSON.stringify(findBill)}`)
+        //   }
+        // });
+
+        if(!findBill.ok){
+            throw Error(findBill.statusText)
+        }
+
+        const parsedResponse = await findBill.json();
+        if (parsedResponse.data) {
+          returnedBills[i] = parsedResponse.data;
+        }
+        console.log('FOUND BILL FROM EXPRESS TO GRAB INFO FOR:', parsedResponse);
+      } catch(err){
+          console.log(err)
+      }
+  }
+    // let foundBill = this.findBillAndReturnInfo(returnedBills[i].title);
+    // console.log(`FROM THE API BILLS, WE ARE CHECKING FOR ${JSON.stringify(returnedBills[i].title)} IN MONGO`)
+    // if (foundBill){
+    //   returnedBills[i] = foundBill;
+    //   console.log(`FOUND THIS BILL IN MONGO: ${JSON.stringify(foundBill)}`)
+    // }
+  let billTitles = [];
+  for (let i=0; i<returnedBills.length;i++){
+    billTitles.push(returnedBills[i].title.slice(0,5) + "...");
+  }
+  console.log(`BILLS FROM QUERY: ${JSON.stringify(billTitles)}`);
+// ===============================
+// NOW UPDATE THE STATE
+// ===============================
+  this.setState({
+    bills: returnedBills
+  }, function() {
+    let billTitles=[];
+    for (let i=0;i<returnedBills.length;i++){
+      billTitles.push(returnedBills[i].title.slice(0,5) + "...")
+    }
+    console.log(`BILLS IN STATE W/ TRACKING COUNTS: ${billTitles}`)
+  })
+}
+// ===========================================================
+// CHECK DATABASE FOR PARTICULAR TITLE
+// ===========================================================
+// findBillAndReturnInfo = async (billTitle) => {
+//   try {
+//     const findBill = await fetch('http://localhost:9000/bills/findBill', {
+//         method: 'POST',
+//         body: JSON.stringify({
+//             title: billTitle,
+//         }),
+//         credentials: 'include',
+//         headers: {
+//         'Content-Type': 'application/json'
+//         }
+//     },function(){
+//       return findBill.json().data
+//     });
+//     if(!findBill.ok){
+//         throw Error(findBill.statusText)
+//     }
+//     const parsedResponse = await findBill.json();
+//     console.log('FOUND BILL FROM EXPRESS TO GRAB INFO FOR:', parsedResponse);
+//     return parsedResponse.data;
+//   } catch(err){
+//       console.log(err)
+//   }
+// }
+
   render() {
     return (
       <div id="container">
@@ -410,17 +583,17 @@ class App extends Component {
         {/* SEARCH BAR - DEFAULT 1ST BUTTON */}
         <Row className="justify-content-center">
           <Col xs={{size: 'auto'}}>
-            <SearchBar onRadioBtnClick={this.onRadioBtnClick} selected={this.state.queryBtn} handleInput={this.handleInput}/>
+            <SearchBar getBillsFromQuery={this.getBillsFromQuery} onRadioBtnClick={this.onRadioBtnClick} selected={this.state.queryBtn} handleInput={this.handleInput}/>
           </Col>
         </Row> <br/>
 
         {/* MAIN CONTENT */}
         <main>
           <Switch>
-            <Route exact path="/" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} handleLogin={this.handleLogin} handleRegister={this.handleRegister} handleChange={this.handleChange}/>)}/>
-            <Route exact path="/tracking" render={(routeProps) => (<TrackingContainer {...routeProps} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} handleLogin={this.handleLogin} handleRegister={this.handleRegister} handleChange={this.handleChange}/>)}/>
-            <Route exact path="/trending" render={(routeProps) => (<TrendingContainer {...routeProps} addBillToTracking={this.addBillToTracking} bills={this.state.trendingBills} updateTrending={this.updateTrending} trackedBills={this.state.trackedBills} />)}/>
-            <Route exact path="/bills" render={(routeProps) => (<BillContainer {...routeProps} trackedBills={this.state.trackedBills} bills={this.state.bills} addBillToTracking={this.addBillToTracking}/>)}/>
+            <Route exact path="/" render={(routeProps) => (<TrackingContainer {...routeProps} failedEntry={this.state.failedEntry} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} handleLogin={this.handleLogin} handleRegister={this.handleRegister} handleChange={this.handleChange}/>)}/>
+            <Route exact path="/tracking" render={(routeProps) => (<TrackingContainer {...routeProps} failedEntry={this.state.failedEntry} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} handleLogin={this.handleLogin} handleRegister={this.handleRegister} handleChange={this.handleChange}/>)}/>
+            <Route exact path="/trending" render={(routeProps) => (<TrendingContainer {...routeProps} untrackBill={this.untrackBill} addBillToTracking={this.addBillToTracking} bills={this.state.trendingBills} updateTrending={this.updateTrending} trackedBills={this.state.trackedBills} />)}/>
+            <Route exact path="/bills" render={(routeProps) => (<BillContainer {...routeProps} untrackBill={this.untrackBill} trackedBills={this.state.trackedBills} bills={this.state.bills} addBillToTracking={this.addBillToTracking}/>)}/>
             <Route exact path="/legislators" render={(routeProps) => (<LegislatorContainer {...routeProps} info={this.state.reps} />)}/>
             <Route component={ My404 }/>
           </Switch>

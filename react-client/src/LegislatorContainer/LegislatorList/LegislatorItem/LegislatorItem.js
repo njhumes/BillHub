@@ -13,7 +13,7 @@ const LegislatorItem = (props) => {
                 </Col>
                 <Col sm="11">
                     <CardTitle><h4>{props.info.firstname + " " + props.info.lastname}</h4></CardTitle>
-                    <CardText>{props.info.state + "-" + props.info.party}</CardText>
+                    <CardText>{props.info.state + " - " + props.info.party}</CardText>
                 </Col>
             </Row>
         </Card>

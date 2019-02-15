@@ -975,7 +975,43 @@ const tempDataReps = [
         "lastname": "Cardin",
         "state":"MD",
         "party": "D",
-        "image": "benjamin_cardin.jpg",}
+        "image": "benjamin_cardin.jpg",},
+    {
+        "firstname": "Robert",
+        "lastname": "Casey",
+        "state":"PA",
+        "party": "D",
+        "image": "robert_casey.jpg",},
+    {
+        "firstname": "Kevin",
+        "lastname": "Cramer",
+        "state":"ND",
+        "party": "R",
+        "image": "kevin_cramer.jpeg",},
+    {
+        "firstname": "Ted",
+        "lastname": "Cruz",
+        "state":"TX",
+        "party": "R",
+        "image": "ted_cruz.jpg",},
+    {
+        "firstname": "Dianne",
+        "lastname": "Feinstein",
+        "state":"CA",
+        "party": "D",
+        "image": "dianne_feinstein.jpg",},
+    {
+        "firstname": "Deb",
+        "lastname": "Fischer",
+        "state":"D",
+        "party": "CA",
+        "image": "deb_fischer.jpg",},
+    {
+        "firstname": "Kirsten",
+        "lastname": "Gillibrand",
+        "state":"NY",
+        "party": "D",
+        "image": "kirsten_gillibrand.jpg",}
 ]
     
 exports.tempData = tempData2;

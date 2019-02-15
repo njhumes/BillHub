@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, ButtonGroup, Container, Col, Row, Input, InputGroup } from 'reactstrap';
+import { Button, ButtonGroup, Container, Col, Row, Input, InputGroup, Form } from 'reactstrap';
 
 const SearchBar = (props) => {
     return (
@@ -16,9 +16,12 @@ const SearchBar = (props) => {
 
                 {/* SEARCH BAR */}
                 <Col xs={{size: 'auto'}}>
-                    <InputGroup>
-                        <Input placeholder="username" onChange={props.handleInput.bind(this)} />
-                    </InputGroup>
+                    <Form onSubmit={props.getBillsFromQuery.bind(this)}>
+                        <InputGroup>
+                            <Input placeholder="username" onChange={props.handleInput.bind(this)} />
+                        </InputGroup>
+                        <Input className="submit" type="Submit" value="Search"/>
+                    </Form>
                 </Col>
             </Row>
     )
