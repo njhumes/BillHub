@@ -9,6 +9,7 @@ import BillContainer from './BillContainer/BillContainer.js';
 import LegislatorContainer from './LegislatorContainer/LegislatorContainer.js';
 // import Login from './Login/Login.js';
 import SearchBar from './SearchBar/SearchBar';
+import ModalPrompt from './Login/ModalPrompt/ModalPrompt';
 const tempData2 = require('./TempData/TempData');
 const stringData = JSON.stringify(tempData2);
 const parsedData = JSON.parse(stringData);
@@ -477,16 +478,23 @@ getBillsFromQuery = async () => {
       return ( item.summary.includes(query) || item.title.includes(query) );
     }
   }
+
   let returnedBills = cleanedData.filter(checkQueryAndState)
   let billTitleList = [];
-  for (let i=0; i<returnedBills.length;i++){
+  let limit = 0;
+  if (returnedBills.length > 10) {
+    limit = 10;
+  } else {
+    limit = returnedBills.length;
+  }
+  for (let i=0; i<limit;i++){
     billTitleList.push(returnedBills[i].title.slice(0,5) + "...")
   }
-  console.log(`BILLS FROM API QUERY: ${JSON.stringify(billTitleList)}`);
+  console.log(`FIRST 10 BILLS FROM API QUERY: ${JSON.stringify(billTitleList)}`);
 // ===========================================================
 // LOOK FOR API BILLS IN MONGO TO PULL TRACKING INFO IF NEEDED
 // ===========================================================
-  for (let i=0; i<returnedBills.length; i++) {
+  for (let i=0; i<limit; i++) {
 
       try {
         const findBill = await fetch('http://localhost:9000/bills/findBill', {
@@ -520,14 +528,8 @@ getBillsFromQuery = async () => {
           console.log(err)
       }
   }
-    // let foundBill = this.findBillAndReturnInfo(returnedBills[i].title);
-    // console.log(`FROM THE API BILLS, WE ARE CHECKING FOR ${JSON.stringify(returnedBills[i].title)} IN MONGO`)
-    // if (foundBill){
-    //   returnedBills[i] = foundBill;
-    //   console.log(`FOUND THIS BILL IN MONGO: ${JSON.stringify(foundBill)}`)
-    // }
   let billTitles = [];
-  for (let i=0; i<returnedBills.length;i++){
+  for (let i=0; i<limit;i++){
     billTitles.push(returnedBills[i].title.slice(0,5) + "...");
   }
   console.log(`BILLS FROM QUERY: ${JSON.stringify(billTitles)}`);
@@ -535,10 +537,10 @@ getBillsFromQuery = async () => {
 // NOW UPDATE THE STATE
 // ===============================
   this.setState({
-    bills: returnedBills
+    bills: returnedBills.slice(0,limit)
   }, function() {
     let billTitles=[];
-    for (let i=0;i<returnedBills.length;i++){
+    for (let i=0;i<limit;i++){
       billTitles.push(returnedBills[i].title.slice(0,5) + "...")
     }
     console.log(`BILLS IN STATE W/ TRACKING COUNTS: ${billTitles}`)
@@ -590,11 +592,62 @@ getBillsFromQuery = async () => {
         {/* MAIN CONTENT */}
         <main>
           <Switch>
-            <Route exact path="/" render={(routeProps) => (<TrackingContainer {...routeProps} failedEntry={this.state.failedEntry} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} handleLogin={this.handleLogin} handleRegister={this.handleRegister} handleChange={this.handleChange}/>)}/>
-            <Route exact path="/tracking" render={(routeProps) => (<TrackingContainer {...routeProps} failedEntry={this.state.failedEntry} info={this.state.logged} trackedBills={this.state.trackedBills} trackedReps={this.state.trackedReps} untrackBill={this.untrackBill} loginSuccess={this.loginSuccess} handleLogin={this.handleLogin} handleRegister={this.handleRegister} handleChange={this.handleChange}/>)}/>
-            <Route exact path="/trending" render={(routeProps) => (<TrendingContainer {...routeProps} untrackBill={this.untrackBill} addBillToTracking={this.addBillToTracking} bills={this.state.trendingBills} updateTrending={this.updateTrending} trackedBills={this.state.trackedBills} />)}/>
-            <Route exact path="/bills" render={(routeProps) => (<BillContainer {...routeProps} untrackBill={this.untrackBill} trackedBills={this.state.trackedBills} bills={this.state.bills} addBillToTracking={this.addBillToTracking}/>)}/>
-            <Route exact path="/legislators" render={(routeProps) => (<LegislatorContainer {...routeProps} info={this.state.reps} />)}/>
+            <Route exact path="/" render={(routeProps) => (
+              <TrackingContainer {...routeProps} 
+                failedEntry={this.state.failedEntry} 
+                info={this.state.logged} 
+                trackedBills={this.state.trackedBills} 
+                trackedReps={this.state.trackedReps} 
+                untrackBill={this.untrackBill} 
+                loginSuccess={this.loginSuccess} 
+                handleLogin={this.handleLogin} 
+                handleRegister={this.handleRegister} 
+                handleChange={this.handleChange}/>)}
+            />
+
+            <Route exact path="/tracking" render={(routeProps) => 
+              (<TrackingContainer {...routeProps} 
+              failedEntry={this.state.failedEntry} 
+              info={this.state.logged} 
+              trackedBills={this.state.trackedBills} 
+              trackedReps={this.state.trackedReps} 
+              untrackBill={this.untrackBill} 
+              loginSuccess={this.loginSuccess} 
+              handleLogin={this.handleLogin} 
+              handleRegister={this.handleRegister} 
+              handleChange={this.handleChange}/>)}
+            />
+
+            <Route exact path="/trending" render={(routeProps) => 
+              (<TrendingContainer {...routeProps} 
+                untrackBill={this.untrackBill} 
+                addBillToTracking={this.addBillToTracking} 
+                bills={this.state.trendingBills} 
+                updateTrending={this.updateTrending} 
+                trackedBills={this.state.trackedBills}
+                logged={this.state.logged} />)}
+            />
+
+            <Route exact path="/bills" render={(routeProps) => 
+              (<BillContainer {...routeProps} 
+              untrackBill={this.untrackBill} 
+              trackedBills={this.state.trackedBills} 
+              bills={this.state.bills} 
+              addBillToTracking={this.addBillToTracking}
+              logged={this.state.logged}
+              />)}
+            />
+
+            <Route exact path="/legislators" render={(routeProps) => 
+              (<LegislatorContainer {...routeProps} 
+              info={this.state.reps} />)}
+            />
+
+            {/* <Route exact path="/modal" render={(routeProps) => 
+              (<ModalPrompt {...routeProps} 
+              />)}
+            /> */}
+
             <Route component={ My404 }/>
           </Switch>
         </main>

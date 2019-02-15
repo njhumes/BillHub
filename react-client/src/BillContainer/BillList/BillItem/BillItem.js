@@ -1,56 +1,71 @@
-import React from 'react'
+import React, {Component} from 'react'
 import { Card, Button, CardTitle, CardText, CardGroup, Row, Col } from 'reactstrap';
 
-const BillItem = (props) => {
+export class BillItem extends Component {
+    constructor(props){
+        super(props);
 
-    //console.log(`TRACKED BILLS: ${JSON.stringify(props.trackedBills)}`)
-
-    // Check if bill id equals one in your tracking list
-    let className = "";
-    let buttonStr = "Track";
-    let alreadyTracked = false;
-    let imgSrc = "/animations/unclicked.gif";
-    for (let i=0; i<props.trackedBills.length; i++){
-        if (props.trackedBills[i]._id == props.billInfo._id) {
-            className = "active";
-            buttonStr = "Untrack";
-            alreadyTracked = true;
-            imgSrc = "/animations/clicked.gif"
+        this.state = {
+            trackedStatus: this.props.trackedStatus,
+            imgSrc: this.props.imgSrc,
         }
     }
-
-    return (
-        <Card className="grayCard" body>
-            <Row>
-                <Col xs="1">
-                    <div className="centerButton">
-                        <h1 className="trackingCount">{props.billInfo.trackingCount}</h1>
-                        <figure> 
-                            <img onClick={
-                                !alreadyTracked ? 
-                                props.addBillToTracking.bind(this,props.billInfo) :
-                                props.untrackBill.bind(this,props.billInfo._id)
-                            } 
-                            className="starIcon" src={imgSrc}/> 
-                        </figure>
-                        {/* <Button 
-                            onClick={
-                                !alreadyTracked ? 
-                                props.addBillToTracking.bind(this,props.billInfo) :
-                                props.untrackBill.bind(this,props.billInfo._id)
-                            } 
-                            className={className}>
-                            {buttonStr}
-                        </Button> */}
-                    </div>
-                </Col>
-                <Col sm="11">
-                    <CardTitle><h4>{props.billInfo.title}</h4></CardTitle>
-                    <CardText>{props.billInfo.summary}</CardText>
-                </Col>
-            </Row>
-        </Card>
-    )
+    addBillToTracking(billInfo){
+        if (this.props.logged){
+            this.setState({
+                trackedStatus: true,
+                imgSrc: "/animations/star_click_cropped_single.gif"
+            })
+            this.props.addBillToTracking(billInfo);
+        } else {
+            // PROMPT USER TO LOGIN
+        }
+    }
+    untrackBill(billId){
+        if (this.props.logged){
+            this.setState({
+                trackedStatus: false,
+                imgSrc: "/animations/star_unclick_cropped_single.gif"
+            })
+            this.props.untrackBill(billId)
+        } else {
+            // PROMPT USER TO LOGIN
+        }
+    }
+    render(){
+        return (
+            <Card className="grayCard" body>
+                <Row>
+                    <Col xs="1">
+                        <div className="centerButton">
+                            <h1 className="trackingCount">{this.props.billInfo.trackingCount}</h1>
+                            <figure> 
+                                <img onClick={
+                                    !this.state.trackedStatus ? 
+                                    this.addBillToTracking.bind(this,this.props.billInfo) :
+                                    this.untrackBill.bind(this,this.props.billInfo._id)
+                                } 
+                                className="starIcon" src={this.state.imgSrc}/> 
+                            </figure>
+                            {/* <Button 
+                                onClick={
+                                    !alreadyTracked ? 
+                                    props.addBillToTracking.bind(this,props.billInfo) :
+                                    props.untrackBill.bind(this,props.billInfo._id)
+                                } 
+                                className={className}>
+                                {buttonStr}
+                            </Button> */}
+                        </div>
+                    </Col>
+                    <Col sm="11">
+                        <CardTitle><h4>{this.props.billInfo.title}</h4></CardTitle>
+                        <CardText>{this.props.billInfo.summary}</CardText>
+                    </Col>
+                </Row>
+            </Card>
+        )
+    }
 }
 
 export default BillItem

@@ -36,6 +36,7 @@ const TrendingContainer = (props) => {
       addBillToTracking={props.addBillToTracking.bind(this)} 
       bills={props.bills} 
       trackedBills={props.trackedBills}
+      logged={props.logged}
     />
   )
 }

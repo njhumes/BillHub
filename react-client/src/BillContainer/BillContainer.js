@@ -1,14 +1,20 @@
 import React from 'react'
 import BillList from './BillList/BillList'
+import ModalPrompt from '../Login/ModalPrompt/ModalPrompt'
 
 const BillContainer = (props) => {
     return (
-      <BillList 
-        addBillToTracking={props.addBillToTracking.bind(this)} 
-        untrackBill={props.untrackBill.bind(this)} 
-        bills={props.bills} 
-        trackedBills={props.trackedBills}
-      />
+      <div>
+        <ModalPrompt />
+        <BillList 
+          addBillToTracking={props.addBillToTracking.bind(this)} 
+          untrackBill={props.untrackBill.bind(this)} 
+          bills={props.bills} 
+          trackedBills={props.trackedBills}
+          logged={props.logged}
+          history={props.history}
+        />
+      </div>
     )
 }
 
