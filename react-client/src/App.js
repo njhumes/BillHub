@@ -103,11 +103,16 @@ class App extends Component {
         console.log(err)
     }
   }
+// ================================================================================================================
+//                             PULL INITIAL DATA FOR TRENDING AND BILL PAGES
+// ================================================================================================================  
   componentDidMount() {
-    // HERE LETS PULL SOME INITIAL DATA: TRENDING
     this.getTrendingBills();
-    // this.getBillsFromQuery("tax", "Iowa");
+    this.getBillsFromQuery("tax", "Iowa");
   }
+// ================================================================================================================
+//                                  CHANGE QUERY STATE WHEN USER TYPES
+// ================================================================================================================ 
   handleInput = (e) => {
     this.setState({
       query: e.target.value
@@ -115,6 +120,9 @@ class App extends Component {
       console.log(`SEARCHBAR SHOWS: ${this.state.query}`)
     });
   }
+// ================================================================================================================
+//                               CHANGE QUERY BUTTON STATE WHEN USER CLICKS
+// ================================================================================================================ 
   onRadioBtnClick = (btn) => {
     this.setState({ 
       queryBtn: btn
@@ -122,8 +130,10 @@ class App extends Component {
       console.log(`Radio Button should now be: ${this.state.queryBtn}`);
     });
   }
+// ================================================================================================================
+//                                CHANGE ACTIVE PAGE WHEN USER NAVIGATES
+// ================================================================================================================ 
   updateNav = (page) => {
-    // If path is trending, then get trending bills
     this.setState({ 
       activePage: page
     }, function() {
@@ -132,9 +142,9 @@ class App extends Component {
       }
     });
   }
-// ==================================================================
-// UPDATE STATE WITH SUCCESSFUL LOGIN
-// ==================================================================
+// ================================================================================================================
+//                                  UPDATE STATE WITH SUCCESSFUL LOGIN
+// ================================================================================================================ 
   loginSuccess = (userId, trackedBills) => {
     let tracked = [];
     if (trackedBills) {
@@ -149,20 +159,17 @@ class App extends Component {
       console.log(`LOGGED IN. LOGGED: ${this.state.logged}, ID: ${this.state._id}, BILLS: ${this.state.trackedBills}`);
     });
   }
+// ================================================================================================================
+//                          ADD TO USER'S TRACKING LIST (MONGO AND REACT STATE)
+// ================================================================================================================
   addBillToTracking = async (billToTrack) => {
-// ==================================================================
-// UPDATE/CREATE IN MONGO DATABASE (CHECK USERS TRACKING INFO FIRST)
-// ==================================================================
     try {
       if (billToTrack._id) {
-// ==================================================================
+// ================================================
 // MONGO: ADD TO USER'S TRACKED BILLS (IF POSSIBLE)
-// ==================================================================
+// ================================================
         const isUserTracking = await fetch(`http://localhost:9000/auth/${this.state._id}/track/${billToTrack._id}`, {
           method: 'PUT',
-          // body: JSON.stringify({
-          //   increment: 1,
-          // }),
           credentials: 'include',
           headers: {
           'Content-Type': 'application/json'
@@ -171,9 +178,9 @@ class App extends Component {
           throw Error(isUserTracking.statusText)
         }
         const parsedIsUserTracking = await isUserTracking.json();
-// ==================================================================
+// ==========================================
 // UPDATE COUNT IN MONGO IF USER JUST TRACKED
-// ==================================================================
+// ==========================================
         if (parsedIsUserTracking.status == 200) {
           const updateBill = await fetch(`http://localhost:9000/trending/track/${billToTrack._id}`, {
           method: 'PUT',
@@ -190,9 +197,9 @@ class App extends Component {
           }
           const parsedUpdateBill = await updateBill.json();
           console.log(`INCREMENTED BILL ID ${JSON.stringify(parsedUpdateBill.data._id)}`)
-// ==================================================================
+// ================================================
 // ADD TO TRACKEDBILLS IN REACT (BASED ON DB REPLY)
-// ==================================================================
+// ================================================
           let updatedArray = [...this.state.bills];
           for(let i = 0; i < updatedArray.length; i++) {
             if(updatedArray[i]._id == billToTrack._id) {
@@ -211,9 +218,9 @@ class App extends Component {
           console.log(`ALREADY TRACKING BILL ${billToTrack._id}`)
         }
       } 
-// ==================================================================
+// ================================================================
 // IF NO ID, CREATE ONE IN MONGO (WE KNOW USER HASN'T TRACKED THEN)
-// ==================================================================
+// ================================================================
       else {
         const createBill = await fetch(`http://localhost:9000/trending/`, {
         method: 'POST',
@@ -234,9 +241,9 @@ class App extends Component {
         }
         const parsedCreateBill = await createBill.json();
         console.log(`DB CREATED BILL:${JSON.stringify(parsedCreateBill)}`)
-// ==================================================================
+// ==================================
 // MONGO: ADD TO USER'S TRACKED BILLS
-// ==================================================================
+// ==================================
         const trackBill = await fetch(`http://localhost:9000/auth/${this.state._id}/track/${parsedCreateBill.data._id}`, {
           method: 'PUT',
           // body: JSON.stringify({
@@ -251,9 +258,9 @@ class App extends Component {
         }
         const parsedTrackBill = await trackBill.json();
         console.log(`Updated bill response from Express API:${JSON.stringify(parsedTrackBill)}`)
-// ==================================================================
+// ========================================
 // TRACK BILL IN STATE & UPDATE BILLS ARRAY
-// ==================================================================
+// ========================================
         let updatedArray = [...this.state.bills];
         for(let i = 0; i < updatedArray.length; i++) {
           if(updatedArray[i].title == parsedCreateBill.data.title) {
@@ -432,9 +439,7 @@ class App extends Component {
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
-    }, function() {
-      // console.log(`SEARCH SHOWS: ${this.state.query}`)
-    })
+    });
   }
   // getBillsFromApi = async () => {
   //   try {
@@ -471,9 +476,7 @@ class App extends Component {
 // THIS SHOULD QUERY THE API WITH USER INPUT
 // ====================================================================================================================
 
-getBillsFromQuery = async (e) => {
-  e.preventDefault();
-
+getBillsFromQuery = async () => {
   const query = this.state.query;
   let state = "";
   switch (this.state.userState) {
@@ -524,13 +527,6 @@ getBillsFromQuery = async (e) => {
             'Content-Type': 'application/json'
             }
         });
-        // ,function(){
-        //   if (findBill){
-            // returnedBills[i] = findBill.data;
-            // console.log(`INJECTED DATA INTO BILL ARRAY: ${JSON.stringify(findBill.data)}`)
-            // console.log(`FOUND THIS BILL IN MONGO: ${JSON.stringify(findBill)}`)
-        //   }
-        // });
 
         if(!findBill.ok){
             throw Error(findBill.statusText)
@@ -551,9 +547,9 @@ getBillsFromQuery = async (e) => {
     billTitles.push(returnedBills[i].title.slice(0,5) + "...");
   }
   console.log(`BILLS FROM QUERY: ${JSON.stringify(billTitles)}`);
-// ===============================
+// ====================
 // NOW UPDATE THE STATE
-// ===============================
+// ====================
   this.setState({
     bills: returnedBills.slice(0,limit)
   }, function() {
@@ -564,6 +560,9 @@ getBillsFromQuery = async (e) => {
     console.log(`BILLS IN STATE W/ TRACKING COUNTS: ${billTitles}`)
   })
 }
+// =============================================================================================================
+//                                  UPDATE WHEN USER SELECTS A STATE TO QUERY
+// =============================================================================================================
 changeState = (e) => {
   this.setState({
     userState: e.target.name
@@ -598,7 +597,6 @@ changeState = (e) => {
 //       console.log(err)
 //   }
 // }
-
   render() {
     return (
       <div id="container">
