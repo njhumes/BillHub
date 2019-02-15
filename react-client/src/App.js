@@ -56,18 +56,26 @@ class App extends Component {
     super();
 
     this.state = {
+      dropdownOpen: false,
       logged: false,
       failedEntry: false,
       _id: null,
+      userState: "CO",
       activePage: 'tracking',
       query: '',
-      queryBtn: 1,
+      queryBtn: 0,
       bills: [],
       trackedBills: [],
       trackedReps: [],
       trendingBills: parsedData.tempData,
       reps: parsedData.tempDataReps
       }
+  }
+
+  toggle = () => {
+    this.setState({
+      dropdownOpen: !this.state.dropdownOpen
+    })
   }
 // =====================================
 // PULL MOST TRACKED BILLS FROM DATABASE
@@ -98,7 +106,7 @@ class App extends Component {
   componentDidMount() {
     // HERE LETS PULL SOME INITIAL DATA: TRENDING
     this.getTrendingBills();
-    this.getBillsFromQuery("tax", "Iowa");
+    // this.getBillsFromQuery("tax", "Iowa");
   }
   handleInput = (e) => {
     this.setState({
@@ -463,11 +471,21 @@ class App extends Component {
 // THIS SHOULD QUERY THE API WITH USER INPUT
 // ====================================================================================================================
 
-getBillsFromQuery = async () => {
+getBillsFromQuery = async (e) => {
+  e.preventDefault();
+
   const query = this.state.query;
   let state = "";
-  if (this.state.queryBtn === 2){
-    state = "Colorado";
+  switch (this.state.userState) {
+    case "CO":
+      state = "Colorado";
+      break;
+    case "CA":
+      state = "California";
+      break;
+    default:
+      state = "";
+      break;
   }
 
   function checkQueryAndState(item) {
@@ -493,7 +511,7 @@ getBillsFromQuery = async () => {
 // ===========================================================
 // LOOK FOR API BILLS IN MONGO TO PULL TRACKING INFO IF NEEDED
 // ===========================================================
-  for (let i=0; i<limit; i++) {
+  for (let i=0; i<limit-1; i++) {
 
       try {
         const findBill = await fetch('http://localhost:9000/bills/findBill', {
@@ -519,14 +537,15 @@ getBillsFromQuery = async () => {
         }
 
         const parsedResponse = await findBill.json();
-        if (parsedResponse.data) {
+        if (parsedResponse.stats == 200) {
           returnedBills[i] = parsedResponse.data;
         }
         console.log('FOUND BILL FROM EXPRESS TO GRAB INFO FOR:', parsedResponse);
       } catch(err){
-          console.log(err)
+        console.log(err)
       }
   }
+  
   let billTitles = [];
   for (let i=0; i<limit;i++){
     billTitles.push(returnedBills[i].title.slice(0,5) + "...");
@@ -544,6 +563,13 @@ getBillsFromQuery = async () => {
     }
     console.log(`BILLS IN STATE W/ TRACKING COUNTS: ${billTitles}`)
   })
+}
+changeState = (e) => {
+  this.setState({
+    userState: e.target.name
+  }, function(){
+    console.log(`USER'S STATE IS NOW: ${this.state.userState}`)
+  });
 }
 // ===========================================================
 // CHECK DATABASE FOR PARTICULAR TITLE
@@ -584,7 +610,16 @@ getBillsFromQuery = async () => {
         {/* SEARCH BAR - DEFAULT 1ST BUTTON */}
         <Row className="justify-content-center">
           <Col xs={{size: 'auto'}}>
-            <SearchBar getBillsFromQuery={this.getBillsFromQuery} onRadioBtnClick={this.onRadioBtnClick} selected={this.state.queryBtn} handleInput={this.handleInput}/>
+            <SearchBar 
+              getBillsFromQuery={this.getBillsFromQuery} 
+              onRadioBtnClick={this.onRadioBtnClick} 
+              selected={this.state.queryBtn} 
+              handleInput={this.handleInput}
+              dropdownOpen={this.state.dropdownOpen}
+              toggle={this.toggle}
+              userState={this.state.userState}
+              changeState={this.changeState}
+            />
           </Col>
         </Row> <br/>
 

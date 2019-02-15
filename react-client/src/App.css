@@ -72,3 +72,8 @@
 .starIcon {
   width: 70px;
 }
+
+.dropdown-menu {
+  height: 300px;
+  overflow-y: scroll;
+}

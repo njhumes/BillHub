@@ -60,7 +60,12 @@ export class BillItem extends Component {
                     </Col>
                     <Col sm="11">
                         <CardTitle><h4>{this.props.billInfo.title}</h4></CardTitle>
-                        <CardText>{this.props.billInfo.summary}</CardText>
+                        <CardText>
+                            {this.props.billInfo.summary.length > 300 ? 
+                                this.props.billInfo.summary.slice(0,370) + "..." : 
+                                this.props.billInfo.summary
+                            }
+                        </CardText>
                     </Col>
                 </Row>
             </Card>
