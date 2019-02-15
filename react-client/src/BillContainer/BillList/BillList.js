@@ -21,8 +21,6 @@ const BillList = (props) => {
                     addBillToTracking={props.addBillToTracking.bind(this)} 
                     billInfo={bill}
                     logged={props.logged}
-                    history={props.history}
-                    promptLogin={props.promptLogin.bind(this)}
                 /> 
             </li>
         )

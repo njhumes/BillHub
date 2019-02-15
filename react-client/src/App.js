@@ -9,7 +9,6 @@ import BillContainer from './BillContainer/BillContainer.js';
 import LegislatorContainer from './LegislatorContainer/LegislatorContainer.js';
 // import Login from './Login/Login.js';
 import SearchBar from './SearchBar/SearchBar';
-import ModalPrompt from './Login/ModalPrompt/ModalPrompt';
 const tempData2 = require('./TempData/TempData');
 const stringData = JSON.stringify(tempData2);
 const parsedData = JSON.parse(stringData);

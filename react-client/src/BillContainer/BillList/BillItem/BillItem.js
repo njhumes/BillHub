@@ -18,7 +18,7 @@ export class BillItem extends Component {
             })
             this.props.addBillToTracking(billInfo);
         } else {
-            // PROMPT USER TO LOGIN
+            // PROMPT THE USER TO LOGIN
         }
     }
     untrackBill(billId){
@@ -29,7 +29,7 @@ export class BillItem extends Component {
             })
             this.props.untrackBill(billId)
         } else {
-            // PROMPT USER TO LOGIN
+            // PROMPT THE USER TO LOGIN
         }
     }
     render(){
